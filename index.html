@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css?v=4" />
+<link rel="stylesheet" href="styles.css?v=5" />
 <style>
   html, body { margin:0; padding:0; background:#eef2f0; }
   body { font-family: "Noto Sans JP", -apple-system, system-ui, sans-serif; }
@@ -20,12 +20,13 @@
 <div id="root"></div>
 
 <!-- ?v= はブラウザキャッシュ回避用。編集して見た目が変わらない時はこの数字を上げてください -->
-<script type="text/babel" src="frames/Shared.jsx?v=4"></script>
-<script type="text/babel" src="frames/Top.jsx?v=2"></script>
-<script type="text/babel" src="frames/List.jsx?v=9"></script>
-<script type="text/babel" src="frames/Detail.jsx?v=9"></script>
+<script type="text/babel" src="frames/Shared.jsx?v=5"></script>
+<script type="text/babel" src="frames/Top.jsx?v=3"></script>
+<script type="text/babel" src="frames/List.jsx?v=14"></script>
+<script type="text/babel" src="frames/Detail.jsx?v=12"></script>
 <script type="text/babel" src="frames/Chat.jsx?v=2"></script>
 <script type="text/babel" src="frames/Stubs.jsx?v=2"></script>
+<script type="text/babel" src="frames/Overview.jsx?v=3"></script>
 
 <script type="text/babel" data-presets="react">
 function Intro() {
@@ -53,10 +54,11 @@ function Intro() {
 const FRAMES = [
   { id: 'top',       label: '01 · TOP',        target: true,  Component: TopFrame,       desc: 'A検索起点（検索窓+現在地+エリア）→B収益枠（大手/特集PR）→C軸（条件/比較/診断）→DSEO（特集記事/人気エリア・路線）。※骨子' },
   { id: 'list',      label: '02 · 一覧',        target: true,  Component: ListFrame,      desc: 'パンくず→件数h1→キーワード検索(常時)+詳細条件(折りたたみ)→地図→スクールカード→ページネーション。有料/無料で情報差、無い情報は非表示。' },
+  { id: 'chat',      label: '02 · 一覧 AI相談',  target: true,  Component: ChatFrame,      height: 760, sub: true, desc: '一覧の右下FABから開くAIコンシェルジュ。質問候補タップ→3校(軸ちがい)→重視点→価値観の質問→最終1校＋体験CTA。クリックで会話が進みます。' },
+  { id: 'comparesheet', label: '02 · 一覧 比較',  target: true, Component: CompareSheetFrame, sub: true, desc: '一覧の[比較する]で下から比較シートがせり上がる（実際の02からも動きます）。一覧を見ながら比較でき、×/背景タップで閉じる。' },
   { id: 'detail',    label: '03 · 詳細',        target: true,  Component: DetailFrame,    desc: '基本情報+3:2ヒーロー→紹介/レッスンイメージ/おすすめ/キャンペーン/体験レッスン/口コミ要約/料金/コーチ/アクセス/施設情報→下部固定CTA。' },
-  { id: 'chat',      label: '06 · AI相談',      target: true,  Component: ChatFrame,      height: 760, desc: 'TOP/一覧の右下FABから開くAIコンシェルジュ。質問候補タップ→3校(軸ちがい)→重視点→価値観の質問→最終1校＋体験CTA。クリックで会話が進みます。' },
-  { id: 'compare',   label: '04 · 一覧比較',    target: false, Component: CompareFrame,    desc: 'チェックしたスクールを表で横並び比較。※骨子のみ' },
-  { id: 'recommend', label: '05 · おすすめ一覧', target: false, Component: RecommendFrame,  desc: '条件マッチ度の高いスクールを厳選提示。※骨子のみ' },
+  { id: 'recommend', label: '04 · おすすめ一覧', target: false, Component: RecommendFrame,  desc: '条件マッチ度の高いスクールを厳選提示。※骨子のみ' },
+  { id: 'overview',  label: '05 · 比較一覧',     target: true,  Component: OverviewCompareFrame, desc: '案A（概要カード→違いだけ比較）を移植。ヒーロー→位置マップ→概要カード→違いだけ比較表→まとめCTA→他エリア→選ぶポイント→関連コラム。並び順は原案のまま、デザインはtaiken基準（emerald/角丸6px/帯見出し）に統一。' },
 ];
 
 function Canvas() {
@@ -66,12 +68,13 @@ function Canvas() {
       alignItems: 'flex-start', overflowX: 'auto', padding: '0 40px 100px',
     }}>
       {FRAMES.map(f => (
-        <div key={f.id} style={{ flex: '0 0 auto', width: 390 }}>
-          <div className="canvas-label">
+        <div key={f.id} style={{ flex: '0 0 auto', width: 390, marginTop: f.sub ? 40 : 0 }}>
+          <div className="canvas-label" style={f.sub ? { paddingLeft: 20 } : null}>
+            {f.sub && <span style={{ color: '#9ca3af', marginRight: 4 }}>└</span>}
             {f.label}
             {f.target ? <span className="badge-target">今回対象</span> : <span className="badge-next">次回対象</span>}
           </div>
-          <div className="canvas-desc">{f.desc}</div>
+          <div className="canvas-desc" style={f.sub ? { paddingLeft: 20 } : null}>{f.desc}</div>
           <div style={{ borderRadius: 22, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.08), 0 6px 20px rgba(0,0,0,.07)' }}>
             <Phone height={f.height}><f.Component /></Phone>
           </div>

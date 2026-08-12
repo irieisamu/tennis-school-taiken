@@ -20,9 +20,39 @@ function FieldBand({ label, children }) {
   );
 }
 
+// コーチのSNS/Webアイコン
+const SNS_ICO = {
+  instagram: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.3" cy="6.7" r="1.1" fill="currentColor" stroke="none" /></svg>,
+  youtube: <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><rect x="2.5" y="6" width="19" height="12" rx="3.5" /><path d="M10.2 9.4v5.2l4.4-2.6z" fill="currentColor" stroke="none" /></svg>,
+  web: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"><path d="M9.5 14.5l5-5" /><path d="M10.5 7.2l1.4-1.4a3.4 3.4 0 0 1 4.8 4.8l-1.4 1.4" /><path d="M13.5 16.8l-1.4 1.4a3.4 3.4 0 0 1-4.8-4.8l1.4-1.4" /></svg>,
+};
+
+function CoachSns({ sns }) {
+  const order = ['instagram', 'youtube', 'web'];
+  const items = order.filter(k => sns && sns[k]);
+  if (items.length === 0) return null;
+  return (
+    <div style={{ display: 'flex', gap: 8, margin: '7px 0 2px' }}>
+      {items.map(k => (
+        <a key={k} href={sns[k]} aria-label={k} style={{
+          width: 34, height: 34, borderRadius: 8, border: '1px solid var(--gray-300)', color: 'var(--gray-600)',
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none',
+        }}>{SNS_ICO[k]}</a>
+      ))}
+    </div>
+  );
+}
+
 function DetailFrame() {
   const s = SCHOOLS[0];
   const thumbs = ['外観', 'コートA', 'コートB', 'ロビー', '受付'];
+
+  // 同エリア（世田谷区）の他スクール動線
+  const AREA_SCHOOLS = [
+    { station: '小田急線 経堂駅 徒歩3分', name: 'レックインドアテニススクール上石神井', rating: 5.0, reviews: 4, desc: '冷暖房完備の室内テニスコートです。コーチは丁寧に指導してくれて、レベル分けもはっきりとしているので…' },
+    { station: '東急世田谷線 松陰神社前 徒歩5分', name: '世田谷テニスガーデン', rating: 4.2, reviews: 8, desc: 'アウトドアコートで開放感たっぷり。初心者から経験者まで幅広く通えるスクールです。' },
+    { station: '京王線 千歳烏山駅 徒歩6分', name: '烏山インドアテニスクラブ', rating: 4.5, reviews: 12, desc: '駅近で通いやすくナイターも充実。振替もしやすいと好評です。' },
+  ];
 
   // 口コミ（項目別の詳細レビュー）
   const REVIEWS = [
@@ -259,19 +289,28 @@ function DetailFrame() {
         </div>
       </Section>
 
-      {/* 13. コーチ */}
+      {/* 13. コーチ（説明＋SNS/Webリンク） */}
       <Section ja="コーチ" en="COACH">
         {[
-          { n: '田中 健一', role: 'ヘッドコーチ', d: '元大学テニス部監督。初心者指導を得意とします。' },
-          { n: '佐藤 美咲', role: 'ジュニア担当', d: 'キッズ・ジュニアのレッスンを10年以上担当。' },
+          {
+            n: '田中 健一',
+            sns: { instagram: '#', youtube: '#', web: '#' },
+            d: '元大学テニス部監督。基礎づくりから丁寧に指導するのが得意で、初心者やブランクのある方も安心して始められます。一人ひとりの目標やレベルに合わせて練習メニューを組み立て、「打てた！」の手応えを大切にしたレッスンを心がけています。コートでお待ちしています。',
+          },
+          {
+            n: '佐藤 美咲',
+            sns: { instagram: '#', web: '#' },
+            d: 'キッズ・ジュニアのレッスンを10年以上担当。子どもの「楽しい！」を引き出しながら、正しいフォームと集中力を無理なく育てます。保護者の方へは上達のポイントや練習の様子をこまめに共有し、ご家庭と二人三脚でサポートしています。',
+          },
         ].map((c, i) => (
-          <div key={i} style={{ display: 'flex', gap: 12, padding: '10px 0', borderTop: i ? '1px solid var(--gray-100)' : 0 }}>
-            <div style={{ flex: '0 0 56px' }}>
-              <Img label="COACH" ratio={false} style={{ width: 56, height: 56, borderRadius: '50%' }} />
+          <div key={i} style={{ display: 'flex', gap: 12, padding: '12px 0', borderTop: i ? '1px solid var(--gray-100)' : 0 }}>
+            <div style={{ flex: '0 0 64px' }}>
+              <Img label="COACH" ratio={false} style={{ width: 64, height: 64, borderRadius: 10 }} />
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 800 }}>{c.n}</div>
-              <p className="sm" style={{ margin: '3px 0 0', color: 'var(--gray-700)' }}>{c.d}</p>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 800, fontSize: 15 }}>{c.n}</div>
+              <CoachSns sns={c.sns} />
+              <p className="sm" style={{ margin: '8px 0 0', color: 'var(--gray-700)', lineHeight: 1.75 }}>{c.d}</p>
             </div>
           </div>
         ))}
@@ -304,6 +343,39 @@ function DetailFrame() {
           <FieldBand label="公式サイト">
             <a href="#" className="base" style={{ color: 'var(--em-600)', textDecoration: 'underline', wordBreak: 'break-all' }}>https://www.s-re.jp/kyodo/</a>
           </FieldBand>
+        </div>
+      </Section>
+
+      {/* 15b. 世田谷区のスクール（同エリアの他スクール動線・横スクロール） */}
+      <Section ja="世田谷区のスクール" en="AREA">
+        <div className="hscroll" style={{ gap: 10, margin: '0 -12px', padding: '0 12px 2px', scrollPaddingLeft: 12 }}>
+          {AREA_SCHOOLS.map((a, i) => (
+            <a key={i} href="#" className="card" style={{ flex: '0 0 78%', textDecoration: 'none', scrollSnapAlign: 'start' }}>
+              <Img label="コート" />
+              <div style={{ padding: '10px 12px 12px' }}>
+                <div className="xs mute" style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                  <span style={{ color: 'var(--em-600)' }}>{Ico.train}</span>{a.station}
+                </div>
+                <div style={{
+                  fontWeight: 800, fontSize: 15, lineHeight: 1.4, margin: '4px 0 6px',
+                  display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                }}>{a.name}</div>
+                <Rating score={a.rating} count={a.reviews} />
+                <p className="sm" style={{
+                  margin: '6px 0 0', color: 'var(--gray-700)',
+                  display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                }}>{a.desc}</p>
+              </div>
+            </a>
+          ))}
+          <a href="#" className="card" style={{
+            flex: '0 0 44%', textDecoration: 'none', scrollSnapAlign: 'start',
+            display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            color: 'var(--em-700)', fontWeight: 700, fontSize: 14, gap: 4,
+          }}>
+            もっと見る{Ico.chevR}
+            <span className="xs mute">世田谷区の一覧へ</span>
+          </a>
         </div>
       </Section>
 

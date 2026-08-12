@@ -69,7 +69,7 @@ function TopFrame() {
 
       {/* ── B3. 大手スクール（PR枠） ─────────────────── */}
       <TopSec ja="大手スクール" en="NATIONAL" pr />
-      <div className="hscroll" style={{ gap: 10, padding: '12px' }}>
+      <div className="hscroll" style={{ gap: 10, padding: '12px', scrollPaddingLeft: 12 }}>
         {BIG.map((b, i) => (
           <a key={i} href="#" className="card" style={{ flex: '0 0 150px', textDecoration: 'none', scrollSnapAlign: 'start' }}>
             <Img label="ロゴ" ratio={false} style={{ height: 84 }} />
@@ -83,7 +83,7 @@ function TopFrame() {
 
       {/* ── B4. 特集（PR枠） ─────────────────────────── */}
       <TopSec ja="特集" en="FEATURE" pr />
-      <div className="hscroll" style={{ gap: 10, padding: '12px' }}>
+      <div className="hscroll" style={{ gap: 10, padding: '12px', scrollPaddingLeft: 12 }}>
         {[0, 1].map(i => (
           <div key={i} style={{ flex: '0 0 78%', scrollSnapAlign: 'start' }}>
             <Img label={'特集バナー ' + (i + 1)} />

@@ -113,7 +113,7 @@ function Phone({ children, width = 390, height }) {
 // ─── ダミーデータ（要件のサンプル値を利用） ────────────────
 const SCHOOLS = [
   {
-    id: 's1', paid: true,
+    id: 's1', paid: true, short: '経堂',
     name: 'スポーツクラブ&テニススクール経堂',
     addr: '東京都世田谷区宮坂3-1-45',
     station: '小田急線 経堂駅 徒歩3分',
@@ -125,7 +125,7 @@ const SCHOOLS = [
     lesson: 'インドア／一般・ジュニア',
   },
   {
-    id: 's2', paid: true,
+    id: 's2', paid: true, short: '三軒茶屋',
     name: 'ルネサンス テニススクール 三軒茶屋',
     addr: '東京都世田谷区太子堂4-1-1',
     station: '東急田園都市線 三軒茶屋駅 徒歩5分',
@@ -137,7 +137,7 @@ const SCHOOLS = [
     lesson: 'アウトドア／一般',
   },
   {
-    id: 's3', paid: false,   // 無料会員：タグ/説明文/画像を出さない
+    id: 's3', paid: false, short: '用賀',   // 無料会員：タグ/説明文/画像を出さない
     name: '世田谷インドアテニスクラブ',
     addr: '東京都世田谷区用賀2-41-11',
     station: '東急田園都市線 用賀駅 徒歩7分',

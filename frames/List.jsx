@@ -2,12 +2,21 @@
 // 仕様: tennis365_ui_requirements_list_page.txt
 
 // ─── スクールカード（再利用可能コンポーネント） ─────────────
-function SchoolCard({ s }) {
+function SchoolCard({ s, selected, onToggle, disabled }) {
   return (
-    <div className="card" style={{ display: 'block', marginBottom: 12 }}>
-      {/* 1. スクール名 → 2. 住所 → 3. 最寄り駅（テキストを先頭にまとめる） */}
+    <div className="card" style={{ display: 'block', marginBottom: 12, border: selected ? '1px solid var(--em-600)' : undefined }}>
+      {/* 1. スクール名 + 比較トグル → 2. 住所 → 3. 最寄り駅 */}
       <div style={{ padding: '12px 12px 10px' }}>
-        <div style={{ fontSize: 16, fontWeight: 800, lineHeight: 1.4 }}>{s.name}</div>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <div style={{ flex: 1, minWidth: 0, fontSize: 16, fontWeight: 800, lineHeight: 1.4 }}>{s.name}</div>
+          <button onClick={onToggle} disabled={disabled} style={{
+            flex: '0 0 auto', display: 'inline-flex', alignItems: 'center', gap: 4, height: 30, padding: '0 10px',
+            fontSize: 12, fontWeight: 700, borderRadius: 'var(--r-chip)', whiteSpace: 'nowrap', fontFamily: 'var(--font-jp)',
+            cursor: disabled ? 'not-allowed' : 'pointer',
+            background: selected ? 'var(--em-600)' : '#fff', color: selected ? '#fff' : 'var(--em-700)',
+            border: '1px solid var(--em-600)', opacity: disabled ? 0.4 : 1,
+          }}>{selected ? '✓ 比較中' : '＋ 比較'}</button>
+        </div>
         <div className="sm mute" style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 5 }}>
           <span style={{ color: 'var(--em-600)' }}>{Ico.pin}</span>{s.addr}
         </div>
@@ -112,7 +121,99 @@ function SearchArea() {
 }
 
 // ─── 一覧フレーム本体 ───────────────────────────────────────
+// ─── 比較トレイ（下部固定・選択中スクールがたまる） ─────────
+function CompareTray({ schools, onCompare, onClear, onRemove, max }) {
+  const ready = schools.length >= 2;
+  return (
+    <div style={{ background: '#fff', borderTop: '1px solid var(--gray-200)', boxShadow: '0 -4px 16px rgba(0,0,0,.08)', padding: '10px 12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+        <span className="sm" style={{ fontWeight: 800 }}><span className="num">{schools.length}</span>件を比較中</span>
+        <span className="xs mute">（最大{max}件）</span>
+        <button onClick={onClear} className="xs" style={{ marginLeft: 'auto', background: 'none', border: 0, color: 'var(--gray-500)', cursor: 'pointer', textDecoration: 'underline' }}>クリア</button>
+      </div>
+      <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap' }}>
+        {schools.map(s => (
+          <span key={s.id} style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: 'var(--em-50)', border: '1px solid var(--em-100)', borderRadius: 'var(--r-chip)', padding: '4px 6px 4px 8px', fontSize: 12, fontWeight: 700, color: 'var(--em-700)' }}>
+            🎾 {s.short || s.name}
+            <button onClick={() => onRemove(s.id)} aria-label="外す" style={{ background: 'none', border: 0, color: 'var(--em-700)', cursor: 'pointer', fontSize: 15, lineHeight: 1, padding: '0 0 0 2px' }}>×</button>
+          </span>
+        ))}
+      </div>
+      <button onClick={ready ? onCompare : undefined} disabled={!ready} className="btn btn-block" style={{ opacity: ready ? 1 : 0.5, cursor: ready ? 'pointer' : 'not-allowed' }}>
+        {ready ? <>比較する（{schools.length}校）{Ico.chevR}</> : 'もう1校選ぶと比較できます'}
+      </button>
+    </div>
+  );
+}
+
+// ─── 比較表（共通部品：ページ版・シート版で流用） ───────────
+function CompareTable({ schools }) {
+  const yen = v => v != null ? v.toLocaleString() + '円〜' : '—';
+  const ROWS = [
+    ['体験料金', s => yen(s.taiken)],
+    ['会費(月)', s => yen(s.kaihi)],
+    ['評価', s => s.reviews > 0 ? `★${s.rating.toFixed(1)}（${s.reviews}件）` : '—'],
+    ['最寄り駅', s => s.station || '—'],
+    ['タイプ', s => s.lesson || '—'],
+    ['特徴', s => (s.tags && s.tags.length) ? s.tags.slice(0, 4).join('・') : '—'],
+  ];
+  const th0 = { position: 'sticky', left: 0, zIndex: 1, textAlign: 'left', padding: '8px 10px', whiteSpace: 'nowrap', borderBottom: '1px solid var(--gray-200)' };
+  return (
+    <div style={{ overflowX: 'auto' }}>
+      <table style={{ borderCollapse: 'collapse', fontSize: 13, minWidth: 92 + schools.length * 140 }}>
+        <thead>
+          <tr>
+            <th style={{ ...th0, width: 92, background: 'var(--em-600)', color: '#fff' }}>項目</th>
+            {schools.map(s => (
+              <th key={s.id} style={{ minWidth: 140, textAlign: 'left', padding: '8px 10px', fontWeight: 800, background: 'var(--em-50)', color: 'var(--em-700)', borderBottom: '1px solid var(--gray-200)', borderLeft: '1px solid var(--gray-200)' }}>{s.name}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {ROWS.map(([label, fn]) => (
+            <tr key={label}>
+              <th style={{ ...th0, width: 92, background: 'var(--gray-50)', color: 'var(--gray-600)', fontWeight: 700 }}>{label}</th>
+              {schools.map(s => (
+                <td key={s.id} style={{ padding: '8px 10px', verticalAlign: 'top', borderBottom: '1px solid var(--gray-200)', borderLeft: '1px solid var(--gray-200)' }}>{fn(s)}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+// ─── 各校CTA（共通部品） ───────────────────────────────────
+function CompareCtas({ schools }) {
+  return (
+    <>
+      {schools.map(s => (
+        <div key={s.id} className="card" style={{ padding: '10px 12px', marginBottom: 8 }}>
+          <div style={{ fontWeight: 800, fontSize: 14, marginBottom: 8 }}>{s.name}</div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <a href="#" className="btn btn-out btn-sm" style={{ flex: 1 }}>詳細を見る</a>
+            <a href="#" className="btn btn-sm" style={{ flex: 1 }}>体験申し込み</a>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
 function ListFrame() {
+  const { useState } = React;
+  const MAX = 3;
+  const [selected, setSelected] = useState([]);
+  const [view, setView] = useState('list');
+  const toggle = (id) => setSelected(cur => cur.includes(id) ? cur.filter(x => x !== id) : (cur.length >= MAX ? cur : [...cur, id]));
+  const selSchools = SCHOOLS.filter(s => selected.includes(s.id));
+
+  // [比較する] → B案：下から比較シートがせり上がる
+  if (view === 'sheet') {
+    return <div className="pf"><CompareSheet schools={selSchools} onClose={() => setView('list')} /></div>;
+  }
+
   return (
     <div className="pf">
       <SiteHeader variant="top" />
@@ -159,9 +260,16 @@ function ListFrame() {
         <div className="xs mute"><span className="num">20</span>件/ページ</div>
       </div>
 
-      {/* 検索結果一覧（有料上位 → 新着順） */}
+      {/* 検索結果一覧（有料上位 → 新着順）。各カードに [＋比較] トグル */}
       <div className="px" style={{ padding: '12px' }}>
-        {SCHOOLS.map(s => <SchoolCard key={s.id} s={s} />)}
+        {SCHOOLS.map(s => (
+          <SchoolCard
+            key={s.id} s={s}
+            selected={selected.includes(s.id)}
+            disabled={!selected.includes(s.id) && selected.length >= MAX}
+            onToggle={() => toggle(s.id)}
+          />
+        ))}
       </div>
 
       {/* ページネーション（?page=N のページ番号方式） */}
@@ -175,10 +283,79 @@ function ListFrame() {
         <button className="btn btn-ghost btn-sm">次へ</button>
       </div>
 
-      {/* 右下フローティング：AI相談 */}
-      <AIFab />
+      {/* 下部固定：AI相談 FAB ＋ 比較トレイ（選択中のみ） */}
+      <div style={{ position: 'sticky', bottom: 0, zIndex: 30, marginTop: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '0 14px 10px', pointerEvents: 'none' }}>
+          <a href="#" style={{
+            pointerEvents: 'auto', display: 'inline-flex', alignItems: 'center', gap: 8, height: 48, padding: '0 18px',
+            background: 'var(--em-600)', color: '#fff', borderRadius: 999, fontWeight: 800, fontSize: 14,
+            textDecoration: 'none', boxShadow: '0 6px 18px rgba(5,150,105,.4)', border: '2px solid #fff', whiteSpace: 'nowrap',
+          }}>🎾 AIに相談</a>
+        </div>
+        {selected.length > 0 && (
+          <CompareTray
+            schools={selSchools} max={MAX}
+            onCompare={() => setView('sheet')}
+            onClear={() => setSelected([])}
+            onRemove={(id) => toggle(id)}
+          />
+        )}
+      </div>
     </div>
   );
 }
 
-Object.assign(window, { ListFrame, SchoolCard });
+// ─── 比較ボトムシート（B案）。一覧の上に下からせり上がる ──
+function CompareSheet({ schools, onClose }) {
+  return (
+    <div style={{ position: 'relative', height: 700, overflow: 'hidden', background: '#fff' }}>
+      {/* 背景：一覧（薄暗く残す） */}
+      <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+        <SiteHeader variant="top" />
+        <Crumb items={['ホーム', '東京都', '世田谷区']} />
+        <div className="px" style={{ padding: '12px 12px 4px' }}>
+          <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, lineHeight: 1.4 }}>
+            世田谷区のテニススクール <span className="num" style={{ color: 'var(--em-600)' }}>128</span>件
+          </h1>
+        </div>
+        <div className="px" style={{ padding: '12px' }}>
+          {SCHOOLS.map(s => (
+            <SchoolCard key={s.id} s={s} selected={schools.some(x => x.id === s.id)} disabled={false} onToggle={() => {}} />
+          ))}
+        </div>
+      </div>
+
+      {/* スクリム（タップで閉じる） */}
+      <div onClick={onClose} style={{ position: 'absolute', inset: 0, background: 'rgba(17,24,39,.5)' }} />
+
+      {/* ボトムシート（下からせり上がり・高め） */}
+      <div className="sheet-up" style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0, height: '92%',
+        background: '#fff', borderRadius: '16px 16px 0 0', boxShadow: '0 -8px 30px rgba(0,0,0,.25)',
+        display: 'flex', flexDirection: 'column',
+      }}>
+        <div style={{ padding: '8px 0 4px', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
+          <div style={{ width: 40, height: 4, borderRadius: 2, background: 'var(--gray-300)' }} />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 14px 10px', borderBottom: '1px solid var(--gray-200)', flex: '0 0 auto' }}>
+          <span style={{ color: 'var(--em-600)' }}>{Ico.compare}</span>
+          <div style={{ flex: 1, fontWeight: 800, fontSize: 16 }}>スクール比較 <span className="num" style={{ color: 'var(--em-600)' }}>{schools.length}</span>校</div>
+          <button onClick={onClose} aria-label="閉じる" style={{ background: 'none', border: 0, fontSize: 22, lineHeight: 1, color: 'var(--gray-500)', cursor: 'pointer' }}>×</button>
+        </div>
+        <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '12px' }}>
+          <CompareTable schools={schools} />
+          <div style={{ height: 12 }} />
+          <CompareCtas schools={schools} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// カンバス表示用：比較シート（B案）を開いた状態
+function CompareSheetFrame() {
+  const picked = SCHOOLS.filter(s => s.id === 's1' || s.id === 's2');
+  return <div className="pf"><CompareSheet schools={picked} onClose={() => {}} /></div>;
+}
+
+Object.assign(window, { ListFrame, SchoolCard, CompareTray, CompareTable, CompareCtas, CompareSheet, CompareSheetFrame });
