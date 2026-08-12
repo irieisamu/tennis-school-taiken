@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>テニススクール体験検索 · UIプロトタイプ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css?v=4" />
+<style>
+  html, body { margin:0; padding:0; background:#eef2f0; }
+  body { font-family: "Noto Sans JP", -apple-system, system-ui, sans-serif; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- ?v= はブラウザキャッシュ回避用。編集して見た目が変わらない時はこの数字を上げてください -->
+<script type="text/babel" src="frames/Shared.jsx?v=2"></script>
+<script type="text/babel" src="frames/List.jsx?v=7"></script>
+<script type="text/babel" src="frames/Detail.jsx?v=9"></script>
+<script type="text/babel" src="frames/Stubs.jsx?v=2"></script>
+
+<script type="text/babel" data-presets="react">
+function Intro() {
+  return (
+    <div style={{ padding: '36px 40px 26px', maxWidth: 1500, margin: '0 auto' }}>
+      <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: '#059669', letterSpacing: '0.1em', marginBottom: 6 }}>
+        UI PROTOTYPE / SMARTPHONE 390px / v1
+      </div>
+      <h1 style={{ margin: 0, fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', color: '#111827' }}>
+        テニススクール体験検索
+      </h1>
+      <div style={{ marginTop: 8, fontSize: 14, color: '#4b5563', maxWidth: 760, lineHeight: 1.7 }}>
+        tennis365 のスクール検索サービス。今回は <b style={{ color: '#059669' }}>一覧・詳細</b> を作り込み、TOP／一覧比較／おすすめ一覧はレイアウト骨子のみ。
+        デザインは詳細ページで確定したデザインシステム（emerald-600 基調・四角寄りの角丸・帯状セクション見出し・3:2画像）を踏襲。
+      </div>
+      <div style={{ marginTop: 12, display: 'flex', gap: 16, flexWrap: 'wrap', fontSize: 11, color: '#4b5563' }}>
+        <div><b style={{ color: '#111827' }}>Accent</b> ／ emerald-600 <span style={{ display: 'inline-block', width: 10, height: 10, background: '#059669', verticalAlign: 'middle', marginLeft: 4, borderRadius: 2 }} /></div>
+        <div><b style={{ color: '#111827' }}>Type</b> ／ Noto Sans JP + Inter (数字)</div>
+        <div><b style={{ color: '#111827' }}>Corner</b> ／ card 6px · chip 3px（四角寄り）</div>
+      </div>
+    </div>
+  );
+}
+
+const FRAMES = [
+  { id: 'top',       label: '01 · TOP',        target: false, Component: TopFrame,       desc: '検索起点（エリア/駅/特徴）+ おすすめ + 新着。※骨子のみ' },
+  { id: 'list',      label: '02 · 一覧',        target: true,  Component: ListFrame,      desc: 'パンくず→件数h1→キーワード検索(常時)+詳細条件(折りたたみ)→地図→スクールカード→ページネーション。有料/無料で情報差、無い情報は非表示。' },
+  { id: 'detail',    label: '03 · 詳細',        target: true,  Component: DetailFrame,    desc: '基本情報+3:2ヒーロー→紹介/レッスンイメージ/おすすめ/キャンペーン/体験レッスン/口コミ要約/料金/コーチ/アクセス/施設情報→下部固定CTA。' },
+  { id: 'compare',   label: '04 · 一覧比較',    target: false, Component: CompareFrame,    desc: 'チェックしたスクールを表で横並び比較。※骨子のみ' },
+  { id: 'recommend', label: '05 · おすすめ一覧', target: false, Component: RecommendFrame,  desc: '条件マッチ度の高いスクールを厳選提示。※骨子のみ' },
+];
+
+function Canvas() {
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: 40,
+      alignItems: 'flex-start', overflowX: 'auto', padding: '0 40px 100px',
+    }}>
+      {FRAMES.map(f => (
+        <div key={f.id} style={{ flex: '0 0 auto', width: 390 }}>
+          <div className="canvas-label">
+            {f.label}
+            {f.target ? <span className="badge-target">今回対象</span> : <span className="badge-next">次回対象</span>}
+          </div>
+          <div className="canvas-desc">{f.desc}</div>
+          <div style={{ borderRadius: 22, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.08), 0 6px 20px rgba(0,0,0,.07)' }}>
+            <Phone><f.Component /></Phone>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function App() {
+  return (<div><Intro /><Canvas /></div>);
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

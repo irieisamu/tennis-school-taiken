@@ -1,0 +1,26 @@
+# OS
+.DS_Store
+.AppleDouble
+Thumbs.db
+desktop.ini
+
+# Editors / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Claude Code（ローカル個人設定のみ除外。launch.json は共有するため残す）
+.claude/settings.local.json
+
+# Logs / temp
+*.log
+.cache/
+tmp/
+.tmp/
+
+# Node（将来ツールを入れた場合の保険）
+node_modules/
+npm-debug.log*
+yarn-error.log*

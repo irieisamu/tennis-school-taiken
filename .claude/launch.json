@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "tennis-school-taiken",
+      "runtimeExecutable": "/usr/local/bin/python3",
+      "runtimeArgs": ["-m", "http.server", "8130", "--directory", "/Users/irieisamu/Desktop/tennis365/tennis_school_taiken"],
+      "port": 8130
+    }
+  ]
+}

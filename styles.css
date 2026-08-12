@@ -1,0 +1,223 @@
+/* tennis365 テニススクール体験検索 — プロトタイプ共通スタイル
+   デザインシステム（詳細/一覧要件で確定した内容を踏襲）:
+   - 配色: emerald-600 基調
+   - 角丸: 四角寄り（カード rounded-md / チップ・ボタン rounded-sm）
+   - 本文16px / 補足・ラベル14px
+   - セクション見出し: グレー帯 + 和文タイトル + 英字ラベル(emerald)
+   - カード画像アスペクト比 3:2 / 情報が無ければ非表示 */
+
+:root {
+  /* emerald (Tailwind) */
+  --em-50:  #ecfdf5;
+  --em-100: #d1fae5;
+  --em-500: #10b981;
+  --em-600: #059669;
+  --em-700: #047857;
+
+  /* gray (Tailwind) */
+  --gray-50:  #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-900: #111827;
+
+  --amber-500: #f59e0b;
+
+  --ink: #111827;
+  --mute: #6b7280;
+  --line: #e5e7eb;
+
+  --font-jp: "Noto Sans JP", "游ゴシック体", YuGothic, "Hiragino Sans", sans-serif;
+  --font-num: "Inter", -apple-system, system-ui, sans-serif;
+  --font-mono: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+
+  --r-card: 6px;   /* rounded-md */
+  --r-chip: 3px;   /* rounded-sm */
+}
+
+/* frame内リセット */
+.pf, .pf * {
+  box-sizing: border-box;
+  font-family: var(--font-jp);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+.pf {
+  font-size: 14px;
+  line-height: 1.65;
+  background: #fff;
+  min-height: 100%;
+  position: relative;
+}
+
+/* ── ユーティリティ ───────────────────────────── */
+.num  { font-family: var(--font-num); font-variant-numeric: tabular-nums; }
+.mute { color: var(--mute); }
+.base { font-size: 16px; }        /* 本文 */
+.sm   { font-size: 14px; }        /* 補足・ラベル */
+.xs   { font-size: 12px; }
+.hr   { height: 1px; background: var(--line); border: 0; margin: 0; }
+.px   { padding-left: 12px; padding-right: 12px; }   /* px-3 = 12px 統一 */
+
+/* スクロールバーを隠す（キャンバス上で綺麗に） */
+.pf::-webkit-scrollbar,
+.hscroll::-webkit-scrollbar { display: none; }
+.pf, .hscroll { scrollbar-width: none; }
+.hscroll { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; }
+
+/* ── ヘッダー（SiteHeader） emerald-600 単色バー + 白文字 ── */
+.site-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 12px;
+  background: var(--em-600);
+  color: #fff;
+}
+.site-header .logo {
+  font-family: var(--font-num); font-weight: 800; font-size: 17px;
+  letter-spacing: -0.02em; color: #fff;
+  display: flex; align-items: baseline; gap: 2px;
+}
+.site-header .logo .sub { font-size: 11px; font-weight: 600; opacity: 0.9; }
+.site-header .ico { width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; color: #fff; }
+
+/* ── パンくず ─────────────────────────────────── */
+.crumb {
+  font-size: 12px; color: var(--gray-500);
+  padding: 8px 12px; background: var(--gray-50);
+  border-bottom: 1px solid var(--gray-200);
+  display: flex; flex-wrap: nowrap; align-items: center; gap: 2px;
+  overflow-x: auto; white-space: nowrap;
+}
+.crumb::-webkit-scrollbar { display: none; }
+.crumb { scrollbar-width: none; }
+.crumb > * { flex: 0 0 auto; }
+.crumb a { color: var(--gray-500); text-decoration: none; }
+.crumb .sep { margin: 0 4px; opacity: 0.6; }
+.crumb .cur { color: var(--gray-700); font-weight: 600; }
+
+/* ── セクション見出し（帯 + 英字ラベル） ────────── */
+.sec-head {
+  display: flex; align-items: baseline; gap: 8px;
+  padding: 9px 12px;
+  background: var(--gray-50);
+  border-top: 1px solid var(--gray-200);
+  border-bottom: 1px solid var(--gray-200);
+}
+.sec-head .ja { font-size: 15px; font-weight: 700; color: var(--ink); }
+.sec-head .en { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--em-600); }
+
+/* ── タグ・チップ（角丸の四角、ピルにしない） ──── */
+.tag {
+  display: inline-flex; align-items: center;
+  font-size: 12px; font-weight: 600; line-height: 1;
+  padding: 4px 7px; border-radius: var(--r-chip);
+  background: var(--em-50); color: var(--em-700);
+  border: 1px solid var(--em-100);
+  white-space: nowrap;
+}
+.tag-plain {
+  background: var(--gray-100); color: var(--gray-600); border-color: var(--gray-200);
+}
+
+/* ── ボタン ───────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 40px; padding: 0 14px;
+  font-size: 14px; font-weight: 700; border-radius: var(--r-chip);
+  background: var(--em-600); color: #fff; border: 1px solid var(--em-600);
+  cursor: pointer; text-decoration: none;
+}
+.btn-out { background: #fff; color: var(--em-700); border: 1px solid var(--em-600); }
+.btn-ghost { background: #fff; color: var(--gray-700); border: 1px solid var(--gray-300); }
+.btn-sm { height: 32px; font-size: 13px; padding: 0 10px; }
+.btn-block { width: 100%; }
+
+/* ── 検索導線ボタン（3列：エリア/駅路線/詳細条件から探す） ── */
+.search-entry {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1px; min-height: 64px; padding: 10px 4px;
+  border: 1px solid var(--gray-300); border-radius: var(--r-card);
+  background: #fff; color: var(--ink);
+  font-family: var(--font-jp); font-size: 14px; font-weight: 700;
+  line-height: 1.35; text-align: center; cursor: pointer;
+}
+.search-entry:hover { border-color: var(--em-600); color: var(--em-700); }
+
+/* ── 評価（★） ───────────────────────────────── */
+.rating { display: inline-flex; align-items: center; gap: 5px; }
+.rating .stars { color: var(--amber-500); letter-spacing: 1px; font-size: 13px; }
+.rating .score { font-family: var(--font-num); font-weight: 800; font-size: 14px; }
+.rating .count { color: var(--gray-500); font-size: 12px; }
+
+/* ── 画像プレースホルダ（斜線ハッチ + ラベル） ── */
+.img-ph {
+  position: relative;
+  background: repeating-linear-gradient(135deg, #eef1f0 0 7px, #f6f8f7 7px 14px);
+  border: 1px solid var(--gray-200);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gray-400); font-family: var(--font-mono);
+  font-size: 10px; text-align: center; overflow: hidden;
+}
+.img-ph .ph-label {
+  background: rgba(255,255,255,0.85); padding: 2px 6px; border-radius: 2px;
+  border: 1px solid var(--gray-200); color: var(--gray-500);
+}
+.ratio-32 { aspect-ratio: 3 / 2; width: 100%; }
+
+/* ── カード ───────────────────────────────────── */
+.card {
+  border: 1px solid var(--gray-200); border-radius: var(--r-card);
+  background: #fff; overflow: hidden;
+}
+
+/* ── 料金の行 ─────────────────────────────────── */
+.price-row { display: flex; align-items: baseline; gap: 6px; }
+.price-row .label { font-size: 12px; color: var(--gray-500); }
+.price-row .val { font-family: var(--font-num); font-weight: 800; font-size: 16px; color: var(--ink); }
+.price-row .val .unit { font-size: 12px; font-weight: 600; color: var(--gray-500); margin-left: 1px; }
+
+/* ── details（詳細条件の折りたたみ） ───────────── */
+.acc { border: 1px solid var(--gray-200); border-radius: var(--r-card); background: #fff; }
+.acc > summary {
+  list-style: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 11px 12px; font-size: 14px; font-weight: 700; color: var(--gray-700);
+}
+.acc > summary::-webkit-details-marker { display: none; }
+.acc[open] > summary { border-bottom: 1px solid var(--gray-200); }
+.acc .acc-body { padding: 12px; }
+.acc .chev { transition: transform .15s; color: var(--gray-400); }
+.acc[open] .chev { transform: rotate(180deg); }
+
+/* ── 施設情報テーブル ─────────────────────────── */
+.spec { width: 100%; border-collapse: collapse; font-size: 14px; }
+.spec th, .spec td { text-align: left; vertical-align: top; padding: 9px 10px; border-bottom: 1px solid var(--gray-200); }
+.spec th { width: 34%; background: var(--gray-50); color: var(--gray-600); font-weight: 700; }
+
+/* ── 下部固定CTA ──────────────────────────────────
+   実機では position:sticky bottom:0 で画面下部固定。
+   複数フレームを並べるキャンバス上で浮かないよう relative にしている。 */
+.cta-bar {
+  position: relative; margin-top: auto; left: 0; right: 0;
+  display: flex; gap: 8px; padding: 10px 12px;
+  background: rgba(255,255,255,0.96); backdrop-filter: blur(4px);
+  border-top: 1px solid var(--gray-200);
+}
+.cta-bar .btn { flex: 1; height: 44px; }
+
+/* ── キャンバス（キャプション/ラベル） ─────────── */
+.canvas-label { font-size: 15px; font-weight: 700; color: #1f2937; margin-bottom: 4px; }
+.canvas-desc  { font-size: 12.5px; color: #6b7280; line-height: 1.6; margin-bottom: 14px; max-width: 340px; }
+.badge-target {
+  display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .05em;
+  color: #fff; background: var(--em-600); border-radius: 3px; padding: 2px 6px; margin-left: 6px; vertical-align: middle;
+}
+.badge-next {
+  display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: .05em;
+  color: var(--gray-500); background: var(--gray-100); border: 1px solid var(--gray-200);
+  border-radius: 3px; padding: 2px 6px; margin-left: 6px; vertical-align: middle;
+}
