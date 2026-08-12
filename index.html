@@ -20,9 +20,11 @@
 <div id="root"></div>
 
 <!-- ?v= はブラウザキャッシュ回避用。編集して見た目が変わらない時はこの数字を上げてください -->
-<script type="text/babel" src="frames/Shared.jsx?v=2"></script>
-<script type="text/babel" src="frames/List.jsx?v=7"></script>
+<script type="text/babel" src="frames/Shared.jsx?v=4"></script>
+<script type="text/babel" src="frames/Top.jsx?v=2"></script>
+<script type="text/babel" src="frames/List.jsx?v=9"></script>
 <script type="text/babel" src="frames/Detail.jsx?v=9"></script>
+<script type="text/babel" src="frames/Chat.jsx?v=2"></script>
 <script type="text/babel" src="frames/Stubs.jsx?v=2"></script>
 
 <script type="text/babel" data-presets="react">
@@ -49,9 +51,10 @@ function Intro() {
 }
 
 const FRAMES = [
-  { id: 'top',       label: '01 · TOP',        target: false, Component: TopFrame,       desc: '検索起点（エリア/駅/特徴）+ おすすめ + 新着。※骨子のみ' },
+  { id: 'top',       label: '01 · TOP',        target: true,  Component: TopFrame,       desc: 'A検索起点（検索窓+現在地+エリア）→B収益枠（大手/特集PR）→C軸（条件/比較/診断）→DSEO（特集記事/人気エリア・路線）。※骨子' },
   { id: 'list',      label: '02 · 一覧',        target: true,  Component: ListFrame,      desc: 'パンくず→件数h1→キーワード検索(常時)+詳細条件(折りたたみ)→地図→スクールカード→ページネーション。有料/無料で情報差、無い情報は非表示。' },
   { id: 'detail',    label: '03 · 詳細',        target: true,  Component: DetailFrame,    desc: '基本情報+3:2ヒーロー→紹介/レッスンイメージ/おすすめ/キャンペーン/体験レッスン/口コミ要約/料金/コーチ/アクセス/施設情報→下部固定CTA。' },
+  { id: 'chat',      label: '06 · AI相談',      target: true,  Component: ChatFrame,      height: 760, desc: 'TOP/一覧の右下FABから開くAIコンシェルジュ。質問候補タップ→3校(軸ちがい)→重視点→価値観の質問→最終1校＋体験CTA。クリックで会話が進みます。' },
   { id: 'compare',   label: '04 · 一覧比較',    target: false, Component: CompareFrame,    desc: 'チェックしたスクールを表で横並び比較。※骨子のみ' },
   { id: 'recommend', label: '05 · おすすめ一覧', target: false, Component: RecommendFrame,  desc: '条件マッチ度の高いスクールを厳選提示。※骨子のみ' },
 ];
@@ -70,7 +73,7 @@ function Canvas() {
           </div>
           <div className="canvas-desc">{f.desc}</div>
           <div style={{ borderRadius: 22, overflow: 'hidden', boxShadow: '0 1px 3px rgba(0,0,0,.08), 0 6px 20px rgba(0,0,0,.07)' }}>
-            <Phone><f.Component /></Phone>
+            <Phone height={f.height}><f.Component /></Phone>
           </div>
         </div>
       ))}

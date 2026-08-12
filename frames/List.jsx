@@ -127,9 +127,9 @@ function ListFrame() {
 
       <SearchArea />
 
-      {/* 「市区町村から探す」導線（都道府県のみ絞り込み時の想定・折りたたみ） */}
-      <div className="px" style={{ padding: '0 12px 12px' }}>
-        <details className="acc">
+      {/* 「市区町村から探す」＋「現在地から探す」（横並び。市区町村は折りたたみ） */}
+      <div className="px" style={{ padding: '0 12px 12px', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+        <details className="acc" style={{ flex: 1, minWidth: 0 }}>
           <summary>市区町村から探す<span className="chev">{Ico.chevD}</span></summary>
           <div className="acc-body" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
             {['世田谷区', '渋谷区', '目黒区', '大田区', '杉並区', '中野区', '品川区', '狛江市', '調布市'].map(c => (
@@ -140,6 +140,7 @@ function ListFrame() {
             ))}
           </div>
         </details>
+        <a href="#" className="btn btn-out" style={{ flex: '0 0 auto', height: 44, whiteSpace: 'nowrap' }}>{Ico.pin}現在地から探す</a>
       </div>
 
       {/* 地図エリア（上下グレー余白 + 角丸カード） */}
@@ -173,6 +174,9 @@ function ListFrame() {
         <button className="btn btn-ghost btn-sm" style={{ width: 36, padding: 0 }}>7</button>
         <button className="btn btn-ghost btn-sm">次へ</button>
       </div>
+
+      {/* 右下フローティング：AI相談 */}
+      <AIFab />
     </div>
   );
 }

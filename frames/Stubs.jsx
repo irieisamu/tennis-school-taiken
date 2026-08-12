@@ -10,31 +10,6 @@ function StubNote({ children }) {
   );
 }
 
-// ─── TOP ────────────────────────────────────────────────────
-function TopFrame() {
-  return (
-    <div className="pf">
-      <SiteHeader variant="top" />
-      <StubNote>次回対象：TOP。検索起点（エリア/駅/特徴）+ おすすめ + 新着スクール</StubNote>
-      <div style={{ padding: '0 12px 12px' }}>
-        <div className="card" style={{ padding: 14, background: 'var(--em-50)', border: '1px solid var(--em-100)' }}>
-          <div style={{ fontWeight: 800, fontSize: 16, marginBottom: 8 }}>テニススクールを探す</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 12px', background: '#fff', border: '1px solid var(--gray-300)', borderRadius: 6 }}>
-            <span style={{ color: 'var(--gray-400)' }}>{Ico.search}</span><span className="sm mute">エリア・駅名・スクール名</span>
-          </div>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 10 }}>
-            {['東京都', '神奈川県', 'インドア', 'ジュニア', '駅近'].map(t => <span key={t} className="tag">{t}</span>)}
-          </div>
-        </div>
-      </div>
-      <SecHead ja="おすすめのスクール" en="PICKUP" />
-      <div style={{ padding: 12 }}><Img label="おすすめカード" /></div>
-      <SecHead ja="新着スクール" en="NEW" />
-      <div style={{ padding: 12 }}><Img label="新着リスト" ratio={false} style={{ height: 120, borderRadius: 6 }} /></div>
-    </div>
-  );
-}
-
 // ─── 一覧比較 ───────────────────────────────────────────────
 function CompareFrame() {
   const rows = ['体験料金', '会費', '評価', 'コート', '最寄り駅', '振替'];
@@ -86,4 +61,4 @@ function RecommendFrame() {
   );
 }
 
-Object.assign(window, { TopFrame, CompareFrame, RecommendFrame });
+Object.assign(window, { CompareFrame, RecommendFrame });

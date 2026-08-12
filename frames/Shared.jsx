@@ -103,7 +103,7 @@ function Phone({ children, width = 390, height }) {
         <span>9:41</span>
         <span style={{ fontSize: 10, opacity: 0.55 }}>●●●●   ▮▮▮</span>
       </div>
-      <div className="pf" style={height ? { height: height - 30, overflow: 'auto' } : { overflow: 'visible' }}>
+      <div className="pf" style={height ? { height: height - 30, minHeight: 0, overflow: 'auto' } : { overflow: 'visible' }}>
         {children}
       </div>
     </div>
@@ -150,6 +150,23 @@ const SCHOOLS = [
   },
 ];
 
+// ─── AI相談 呼び出しボタン（右下フローティング） ────────────
+// 実機では画面右下に常設。モックのカンバス上ではフレーム下部右寄せに固定表示。
+function AIFab({ onClick }) {
+  return (
+    <div style={{
+      position: 'sticky', bottom: 14, zIndex: 30, marginTop: 8,
+      display: 'flex', justifyContent: 'flex-end', padding: '0 14px 14px', pointerEvents: 'none',
+    }}>
+      <a href="#" onClick={onClick} style={{
+        pointerEvents: 'auto', display: 'inline-flex', alignItems: 'center', gap: 8, height: 48, padding: '0 18px',
+        background: 'var(--em-600)', color: '#fff', borderRadius: 999, fontWeight: 800, fontSize: 14,
+        textDecoration: 'none', boxShadow: '0 6px 18px rgba(5,150,105,.4)', border: '2px solid #fff', whiteSpace: 'nowrap',
+      }}>🎾 AIに相談</a>
+    </div>
+  );
+}
+
 Object.assign(window, {
-  Ico, SiteHeader, Logo, SecHead, Crumb, Rating, Img, Phone, SCHOOLS,
+  Ico, SiteHeader, Logo, SecHead, Crumb, Rating, Img, Phone, SCHOOLS, AIFab,
 });
