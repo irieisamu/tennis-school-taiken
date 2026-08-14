@@ -91,38 +91,93 @@ function SchoolCard({ s, selected, onToggle, disabled }) {
   );
 }
 
-// ─── 検索条件エリア ─────────────────────────────────────────
-function SearchArea() {
-  // 3列の検索導線（詳細条件で絞り込む → エリア/駅路線/詳細条件から探す）
+// ─── キーワード検索（常時表示・最上部固定） ─────────────────
+function KeywordBox() {
+  return (
+    <div className="px" style={{ padding: '12px', background: '#fff' }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 12px',
+        border: '1px solid var(--gray-300)', borderRadius: 'var(--r-card)', background: '#fff',
+      }}>
+        <span style={{ color: 'var(--gray-400)' }}>{Ico.search}</span>
+        <span className="sm mute">スクール名・住所・駅名で検索</span>
+      </div>
+    </div>
+  );
+}
+
+// ─── 探し方の入口（エリア/駅路線/詳細条件 ＋ 市区町村/現在地） ──
+// スコープにより配置が変わる（都道府県=上部／市区町村=ページング下）
+function BrowseTools({ sc }) {
   const entries = [
     { l1: 'エリアから', l2: '探す' },
     { l1: '駅路線から', l2: '探す' },
     { l1: '詳細条件から', l2: '探す' },
   ];
   return (
-    <div className="px" style={{ padding: '12px', background: '#fff' }}>
-      {/* テニススクール診断 */}
-      <button className="btn btn-out btn-block" style={{ height: 46 }}>テニススクール診断</button>
-
-      {/* キーワード検索は常時表示 */}
-      <div style={{
-        display: 'flex', alignItems: 'center', gap: 8, height: 44, padding: '0 12px', marginTop: 10,
-        border: '1px solid var(--gray-300)', borderRadius: 'var(--r-card)', background: '#fff',
-      }}>
-        <span style={{ color: 'var(--gray-400)' }}>{Ico.search}</span>
-        <span className="sm mute">スクール名・住所・駅名で検索</span>
+    <div style={{ background: '#fff' }}>
+      {/* 3列の検索導線 */}
+      <div className="px" style={{ padding: '0 12px 12px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+          {entries.map((e, i) => (
+            <button key={i} className="search-entry">
+              <span>{e.l1}</span>
+              <span>{e.l2}</span>
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* 3列の検索導線 */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8, marginTop: 8 }}>
-        {entries.map((e, i) => (
-          <button key={i} className="search-entry">
-            <span>{e.l1}</span>
-            <span>{e.l2}</span>
-          </button>
+      {/* 「市区町村から探す」＋「現在地から探す」（横並び。市区町村は折りたたみ） */}
+      <div className="px" style={{ padding: '0 12px 12px', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+        <details className="acc" open={sc.drillOpen} style={{ flex: 1, minWidth: 0 }}>
+          <summary>{sc.drillLabel}<span className="chev">{Ico.chevD}</span></summary>
+          <div className="acc-body" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+            {sc.drillItems.map(c => (
+              <a key={c} href="#" className="sm" style={{
+                textAlign: 'center', padding: '8px 4px', border: '1px solid var(--gray-200)',
+                borderRadius: 'var(--r-chip)', textDecoration: 'none', color: 'var(--gray-700)',
+              }}>{c}</a>
+            ))}
+          </div>
+        </details>
+        <a href="#" className="btn btn-out" style={{ flex: '0 0 auto', height: 44, whiteSpace: 'nowrap' }}>{Ico.pin}現在地から探す</a>
+      </div>
+    </div>
+  );
+}
+
+// セクション見出し（h2）共通スタイル
+const SECTION_H2 = { margin: '0 0 10px', fontSize: 15, fontWeight: 800, color: 'var(--ink)' };
+
+// 一覧・比較への回遊リンク（見出し付き）。都道府県スコープではページ下部に単体表示
+function RelatedLinks({ sc }) {
+  return (
+    <div style={{ background: 'var(--gray-50)', borderTop: '1px solid var(--gray-200)', padding: '16px 12px' }}>
+      <h2 style={SECTION_H2}>{sc.relatedLabel}</h2>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {sc.related.map(r => (
+          <a key={r} href="#" className="btn btn-out btn-block" style={{ justifyContent: 'space-between', height: 48, padding: '0 14px' }}>{r}{Ico.chevR}</a>
         ))}
       </div>
     </div>
+  );
+}
+
+// 市区町村スコープ用：ページング下を2見出しに分割
+//  ①「テニススクールを探す」＝検索窓＋探し方の入口／②「◯◯で探す」＝一覧・比較への回遊
+function BottomFinder({ sc }) {
+  return (
+    <>
+      <div style={{ background: '#fff', borderTop: '1px solid var(--gray-200)' }}>
+        <div className="px" style={{ padding: '16px 12px 0' }}>
+          <h2 style={SECTION_H2}>テニススクールを探す</h2>
+        </div>
+        <KeywordBox />
+        <BrowseTools sc={sc} />
+      </div>
+      <RelatedLinks sc={sc} />
+    </>
   );
 }
 
@@ -207,48 +262,74 @@ function CompareCtas({ schools }) {
   );
 }
 
-function ListFrame() {
+// 一覧の階層バリアント（都道府県 / 市区町村 / 駅）。パンくず・見出し・件数・絞り込み導線が変わる
+const LIST_SCOPES = {
+  // 市区町村（デフォルト）
+  city: {
+    crumb: ['ホーム', '東京都', '世田谷区'], title: '世田谷区', count: 12,
+    browseBelow: true, // 絞り込み済みなので「探し方の入口」はページング下へ
+    drillLabel: '市区町村から探す', drillOpen: false,
+    drillItems: ['世田谷区', '渋谷区', '目黒区', '大田区', '杉並区', '中野区', '品川区', '狛江市', '調布市'],
+    relatedLabel: '世田谷区で探す',
+    related: ['世田谷区のおすすめスクール一覧を見る', '世田谷区のスクール比較を見る'],
+  },
+  // 都道府県（東京都）：件数が多く、市区町村での絞り込みを最初から促す（開いた状態）
+  pref: {
+    crumb: ['ホーム', '東京都'], title: '東京都', count: 128,
+    drillLabel: '市区町村から探す', drillOpen: false,
+    drillItems: ['世田谷区', '渋谷区', '新宿区', '港区', '目黒区', '大田区', '杉並区', '中野区', '品川区', '足立区', '江戸川区', '八王子市'],
+    relatedLabel: '東京都で探す',
+    related: ['東京都の市区町村から探す', '東京都のスクール比較を見る'],
+  },
+  // 駅（用賀駅）：件数が少なく、近隣の駅・エリアへ広げる導線を用意
+  station: {
+    crumb: ['ホーム', '東京都', '世田谷区', '用賀駅'], title: '用賀駅', count: 8,
+    drillLabel: '近隣の駅から探す', drillOpen: false,
+    drillItems: ['二子玉川駅', '桜新町駅', '上町駅', '駒沢大学駅', '三軒茶屋駅', '溝の口駅'],
+    relatedLabel: '用賀駅・世田谷区で探す',
+    related: ['世田谷区のおすすめスクール一覧を見る', '用賀駅のスクール比較を見る'],
+  },
+};
+
+function ListFrame({ scope = 'city' } = {}) {
   const { useState } = React;
+  const sc = LIST_SCOPES[scope] || LIST_SCOPES.city;
   const MAX = 3;
   const [selected, setSelected] = useState([]);
   const [view, setView] = useState('list');
   const toggle = (id) => setSelected(cur => cur.includes(id) ? cur.filter(x => x !== id) : (cur.length >= MAX ? cur : [...cur, id]));
   const selSchools = SCHOOLS.filter(s => selected.includes(s.id));
 
+  // 件数からページング情報を算出（1ページに収まる件数ならページングは出さない）
+  const PER_PAGE = 20;
+  const total = sc.count;
+  const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
+  const shownEnd = Math.min(PER_PAGE, total);
+  const headPages = [];
+  for (let i = 1; i <= Math.min(3, totalPages); i++) headPages.push(i);
+  const showEllipsis = totalPages > 4;
+  const showLast = totalPages > 3 && !headPages.includes(totalPages);
+
   // [比較する] → B案：下から比較シートがせり上がる
   if (view === 'sheet') {
-    return <div className="pf"><CompareSheet schools={selSchools} onClose={() => setView('list')} /></div>;
+    return <div className="pf"><CompareSheet schools={selSchools} onClose={() => setView('list')} crumb={sc.crumb} title={sc.title} count={sc.count} /></div>;
   }
 
   return (
     <div className="pf">
       <SiteHeader variant="top" />
-      <Crumb items={['ホーム', '東京都', '世田谷区']} />
+      <Crumb items={sc.crumb} />
 
       {/* 件数 h1（パンくず直後・検索フォームより上） */}
       <div className="px" style={{ padding: '12px 12px 4px' }}>
         <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, lineHeight: 1.4 }}>
-          世田谷区のテニススクール <span className="num" style={{ color: 'var(--em-600)' }}>128</span>件
+          {sc.title}のテニススクール <span className="num" style={{ color: 'var(--em-600)' }}>{sc.count.toLocaleString()}</span>件
         </h1>
       </div>
 
-      <SearchArea />
-
-      {/* 「市区町村から探す」＋「現在地から探す」（横並び。市区町村は折りたたみ） */}
-      <div className="px" style={{ padding: '0 12px 12px', display: 'flex', gap: 8, alignItems: 'flex-start' }}>
-        <details className="acc" style={{ flex: 1, minWidth: 0 }}>
-          <summary>市区町村から探す<span className="chev">{Ico.chevD}</span></summary>
-          <div className="acc-body" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-            {['世田谷区', '渋谷区', '目黒区', '大田区', '杉並区', '中野区', '品川区', '狛江市', '調布市'].map(c => (
-              <a key={c} href="#" className="sm" style={{
-                textAlign: 'center', padding: '8px 4px', border: '1px solid var(--gray-200)',
-                borderRadius: 'var(--r-chip)', textDecoration: 'none', color: 'var(--gray-700)',
-              }}>{c}</a>
-            ))}
-          </div>
-        </details>
-        <a href="#" className="btn btn-out" style={{ flex: '0 0 auto', height: 44, whiteSpace: 'nowrap' }}>{Ico.pin}現在地から探す</a>
-      </div>
+      {/* 検索窓・探し方の入口：都道府県は上部、市区町村（絞り込み済み）はページング下へ */}
+      {!sc.browseBelow && <KeywordBox />}
+      {!sc.browseBelow && <BrowseTools sc={sc} />}
 
       {/* 地図エリア（上下グレー余白 + 角丸カード） */}
       <div style={{ background: 'var(--gray-50)', padding: '12px', borderTop: '1px solid var(--gray-200)', borderBottom: '1px solid var(--gray-200)' }}>
@@ -262,8 +343,8 @@ function ListFrame() {
 
       {/* 表示件数（1ページ20件を明示） */}
       <div className="px" style={{ padding: '12px 12px 0', display: 'flex', alignItems: 'baseline', justifyContent: 'space-between' }}>
-        <div className="sm mute">全<span className="num">128</span>件中 <span className="num">1〜20</span>件を表示</div>
-        <div className="xs mute"><span className="num">20</span>件/ページ</div>
+        <div className="sm mute">全<span className="num">{total.toLocaleString()}</span>件中 <span className="num">1〜{shownEnd}</span>件を表示</div>
+        {totalPages > 1 && <div className="xs mute"><span className="num">{PER_PAGE}</span>件/ページ</div>}
       </div>
 
       {/* 検索結果一覧（有料上位 → 新着順）。各カードに [＋比較] トグル */}
@@ -278,29 +359,21 @@ function ListFrame() {
         ))}
       </div>
 
-      {/* ページネーション（?page=N のページ番号方式） */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '4px 12px 20px' }}>
-        <button className="btn btn-ghost btn-sm">前へ</button>
-        {['1', '2', '3'].map((p, i) => (
-          <button key={p} className={'btn btn-sm ' + (i === 0 ? '' : 'btn-ghost')} style={{ width: 36, padding: 0 }}>{p}</button>
-        ))}
-        <span className="sm mute">…</span>
-        <button className="btn btn-ghost btn-sm" style={{ width: 36, padding: 0 }}>7</button>
-        <button className="btn btn-ghost btn-sm">次へ</button>
-      </div>
-
-      {/* 関連リンク（同エリア階層の一覧・比較への回遊導線） */}
-      <div style={{ background: 'var(--gray-50)', borderTop: '1px solid var(--gray-200)', padding: '16px 12px' }}>
-        <div className="sm" style={{ fontWeight: 800, color: 'var(--gray-700)', marginBottom: 10 }}>世田谷区で探す</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <a href="#" className="btn btn-out btn-block" style={{ justifyContent: 'space-between', height: 48, padding: '0 14px' }}>
-            世田谷区のおすすめスクール一覧を見る{Ico.chevR}
-          </a>
-          <a href="#" className="btn btn-out btn-block" style={{ justifyContent: 'space-between', height: 48, padding: '0 14px' }}>
-            世田谷区のスクール比較を見る{Ico.chevR}
-          </a>
+      {/* ページネーション（?page=N のページ番号方式。1ページに収まる件数なら非表示） */}
+      {totalPages > 1 && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, padding: '4px 12px 20px' }}>
+          <button className="btn btn-ghost btn-sm">前へ</button>
+          {headPages.map((p, i) => (
+            <button key={p} className={'btn btn-sm ' + (i === 0 ? '' : 'btn-ghost')} style={{ width: 36, padding: 0 }}>{p}</button>
+          ))}
+          {showEllipsis && <span className="sm mute">…</span>}
+          {showLast && <button className="btn btn-ghost btn-sm" style={{ width: 36, padding: 0 }}>{totalPages}</button>}
+          <button className="btn btn-ghost btn-sm">次へ</button>
         </div>
-      </div>
+      )}
+
+      {/* ページング下：市区町村は「◯◯で探す」セクション（検索窓＋探し方の入口＋一覧/比較）、都道府県は回遊リンクのみ */}
+      {sc.browseBelow ? <BottomFinder sc={sc} /> : <RelatedLinks sc={sc} />}
 
       {/* 下部固定：AI相談 FAB ＋ 比較トレイ（選択中のみ） */}
       <div style={{ position: 'sticky', bottom: 0, zIndex: 30, marginTop: 12 }}>
@@ -325,16 +398,16 @@ function ListFrame() {
 }
 
 // ─── 比較ボトムシート（B案）。一覧の上に下からせり上がる ──
-function CompareSheet({ schools, onClose }) {
+function CompareSheet({ schools, onClose, crumb = ['ホーム', '東京都', '世田谷区'], title = '世田谷区', count = 128 }) {
   return (
     <div style={{ position: 'relative', height: 700, overflow: 'hidden', background: '#fff' }}>
       {/* 背景：一覧（薄暗く残す） */}
       <div style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
         <SiteHeader variant="top" />
-        <Crumb items={['ホーム', '東京都', '世田谷区']} />
+        <Crumb items={crumb} />
         <div className="px" style={{ padding: '12px 12px 4px' }}>
           <h1 style={{ margin: 0, fontSize: 19, fontWeight: 800, lineHeight: 1.4 }}>
-            世田谷区のテニススクール <span className="num" style={{ color: 'var(--em-600)' }}>128</span>件
+            {title}のテニススクール <span className="num" style={{ color: 'var(--em-600)' }}>{count.toLocaleString()}</span>件
           </h1>
         </div>
         <div className="px" style={{ padding: '12px' }}>
@@ -377,4 +450,8 @@ function CompareSheetFrame() {
   return <div className="pf"><CompareSheet schools={picked} onClose={() => {}} /></div>;
 }
 
-Object.assign(window, { ListFrame, SchoolCard, CompareTray, CompareTable, CompareCtas, CompareSheet, CompareSheetFrame });
+// 階層バリアント（カンバス表示用）
+function ListFramePref() { return <ListFrame scope="pref" />; }
+function ListFrameStation() { return <ListFrame scope="station" />; }
+
+Object.assign(window, { ListFrame, ListFramePref, ListFrameStation, SchoolCard, CompareTray, CompareTable, CompareCtas, CompareSheet, CompareSheetFrame });

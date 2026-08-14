@@ -21,8 +21,8 @@
 
 <!-- ?v= はブラウザキャッシュ回避用。編集して見た目が変わらない時はこの数字を上げてください -->
 <script type="text/babel" src="frames/Shared.jsx?v=6"></script>
-<script type="text/babel" src="frames/Top.jsx?v=3"></script>
-<script type="text/babel" src="frames/List.jsx?v=16"></script>
+<script type="text/babel" src="frames/Top.jsx?v=7"></script>
+<script type="text/babel" src="frames/List.jsx?v=23"></script>
 <script type="text/babel" src="frames/Detail.jsx?v=12"></script>
 <script type="text/babel" src="frames/Chat.jsx?v=2"></script>
 <script type="text/babel" src="frames/Stubs.jsx?v=2"></script>
@@ -53,7 +53,8 @@ function Intro() {
 
 const FRAMES = [
   { id: 'top',       label: '01 · TOP',        target: true,  Component: TopFrame,       desc: 'A検索起点（検索窓+現在地+エリア）→B収益枠（大手/特集PR）→C軸（条件/比較/診断）→DSEO（特集記事/人気エリア・路線）。※骨子' },
-  { id: 'list',      label: '02 · 一覧',        target: true,  Component: ListFrame,      desc: 'パンくず→件数h1→キーワード検索(常時)+詳細条件(折りたたみ)→地図→スクールカード→ページネーション。有料/無料で情報差、無い情報は非表示。' },
+  { id: 'list',      label: '02 · 一覧 都道府県', target: true,  Component: ListFramePref,   desc: '階層＝都道府県（東京都）。件数が多いので「市区町村から探す」を最初から展開し絞り込みを促す。パンくず→件数h1→キーワード検索(常時)+詳細条件(折りたたみ)→地図→スクールカード→ページネーション。有料/無料で情報差。' },
+  { id: 'list-city', label: '02 · 一覧 市区町村・駅', target: true, Component: ListFrame, sub: true, desc: '階層＝市区町村（世田谷区）。パンくずはホーム›東京都›世田谷区。「市区町村から探す」で近隣区へ、下部から一覧・比較へ回遊。' },
   { id: 'chat',      label: '02 · 一覧 AI相談',  target: true,  Component: ChatFrame,      height: 760, sub: true, desc: '一覧の右下FABから開くAIコンシェルジュ。質問候補タップ→3校(軸ちがい)→重視点→価値観の質問→最終1校＋体験CTA。クリックで会話が進みます。' },
   { id: 'comparesheet', label: '02 · 一覧 比較',  target: true, Component: CompareSheetFrame, sub: true, desc: '一覧の[比較する]で下から比較シートがせり上がる（実際の02からも動きます）。一覧を見ながら比較でき、×/背景タップで閉じる。' },
   { id: 'detail',    label: '03 · 詳細',        target: true,  Component: DetailFrame,    desc: '基本情報+3:2ヒーロー→紹介/レッスンイメージ/おすすめ/キャンペーン/体験レッスン/口コミ要約/料金/コーチ/アクセス/施設情報→下部固定CTA。' },

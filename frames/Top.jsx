@@ -18,7 +18,51 @@ function TopSec({ ja, en, pr }) {
   );
 }
 
+// ── 検索履歴（localStorage）。プロトタイプでは未保存時にデモ履歴を投入 ──
+const TOP_HISTORY_KEY = 'ts_history_v2';
+const DEMO_HISTORY = [
+  { type: 'school', name: '世田谷インドアテニスクラブ', city: '世田谷区', station: '用賀駅' },
+  { type: 'station', name: '用賀駅' },
+  { type: 'city', name: '世田谷区' },
+  { type: 'pref', name: '東京都' },
+];
+function readTopHistory() {
+  try {
+    const raw = localStorage.getItem(TOP_HISTORY_KEY);
+    if (raw) return (JSON.parse(raw) || []).slice(0, 5);
+    localStorage.setItem(TOP_HISTORY_KEY, JSON.stringify(DEMO_HISTORY)); // 初回はデモ投入
+  } catch (e) {}
+  return DEMO_HISTORY.slice(0, 5);
+}
+
+// ── 続きから探す（段①最近見た＋段②直近1件からのドリル導線） ──
+function TopHistory({ history, onClear }) {
+  return (
+    <>
+      <TopSec ja="続きから探す" en="HISTORY" />
+      <div style={{ padding: 12 }}>
+        {/* 段①：最近見た（時系列・複数） */}
+        <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 6 }}>
+          <div className="xs mute" style={{ fontWeight: 700 }}>最近見た</div>
+          <button onClick={onClear} className="xs" style={{ background: 'none', border: 0, color: 'var(--gray-500)', textDecoration: 'underline', cursor: 'pointer' }}>履歴を消す</button>
+        </div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+          {history.map((h, i) => (
+            <a key={i} href="#" className="tag tag-plain" style={{ textDecoration: 'none', padding: '6px 10px', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+              <span style={{ color: 'var(--em-600)', display: 'inline-flex', alignItems: 'center' }}>{h.type === 'school' ? '🎾' : Ico.pin}</span>
+              {h.name}
+            </a>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
 function TopFrame() {
+  const { useState } = React;
+  const [history, setHistory] = useState(() => readTopHistory());
+  const clearHistory = () => { try { localStorage.removeItem(TOP_HISTORY_KEY); } catch (e) {} setHistory([]); };
   const PREFS = ['北海道', '宮城県', '東京都', '神奈川県', '埼玉県', '千葉県', '愛知県', '大阪府', '京都府', '兵庫県', '広島県', '福岡県'];
   const FEATURES = ['インドア', 'アウトドア', 'ジュニア', '初心者歓迎', '駅近', 'ナイター', '振替可', '女性向け', '個人レッスン', '短期集中'];
   const BIG = [
@@ -53,19 +97,8 @@ function TopFrame() {
         </div>
       </div>
 
-      {/* ── A2. エリアから探す（都道府県一覧） ───────── */}
-      <TopSec ja="エリアから探す" en="AREA" />
-      <div style={{ padding: 12 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-          {PREFS.map(p => (
-            <a key={p} href="#" className="sm" style={{
-              textAlign: 'center', padding: '10px 4px', border: '1px solid var(--gray-200)',
-              borderRadius: 'var(--r-chip)', textDecoration: 'none', color: 'var(--gray-700)', fontWeight: 600,
-            }}>{p}</a>
-          ))}
-        </div>
-        <a href="#" className="btn btn-ghost btn-sm btn-block" style={{ marginTop: 10 }}>都道府県をすべて見る{Ico.chevR}</a>
-      </div>
+      {/* ── A2. 続きから探す（検索履歴・localStorage） ── */}
+      {history.length > 0 && <TopHistory history={history} onClear={clearHistory} />}
 
       {/* ── B3. 大手スクール（PR枠） ─────────────────── */}
       <TopSec ja="大手スクール" en="NATIONAL" pr />
@@ -140,6 +173,20 @@ function TopFrame() {
           </a>
         ))}
         <a href="#" className="btn btn-ghost btn-sm btn-block" style={{ marginTop: 10 }}>記事をもっと見る{Ico.chevR}</a>
+      </div>
+
+      {/* ── D8b. エリアから探す（都道府県一覧） ───────── */}
+      <TopSec ja="エリアから探す" en="AREA" />
+      <div style={{ padding: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
+          {PREFS.map(p => (
+            <a key={p} href="#" className="sm" style={{
+              textAlign: 'center', padding: '10px 4px', border: '1px solid var(--gray-200)',
+              borderRadius: 'var(--r-chip)', textDecoration: 'none', color: 'var(--gray-700)', fontWeight: 600,
+            }}>{p}</a>
+          ))}
+        </div>
+        <a href="#" className="btn btn-ghost btn-sm btn-block" style={{ marginTop: 10 }}>都道府県をすべて見る{Ico.chevR}</a>
       </div>
 
       {/* ── D9. 人気エリア・路線から探す（内部リンク／SEO補強） ── */}
