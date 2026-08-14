@@ -137,13 +137,13 @@ const SCHOOLS = [
     lesson: 'アウトドア／一般',
   },
   {
-    id: 's3', paid: false, short: '用賀',   // 無料会員：タグ/説明文/画像を出さない
+    id: 's3', paid: false, short: '用賀',   // 無料会員：名前・住所・駅・詳細ボタンのみ（画像/タグ/評価/料金/電話/体験申込は非表示）
     name: '世田谷インドアテニスクラブ',
     addr: '東京都世田谷区用賀2-41-11',
     station: '東急田園都市線 用賀駅 徒歩7分',
     images: [],
     tags: [],
-    rating: 3.8, reviews: 3,   // 口コミは無料でも表示
+    rating: 3.8, reviews: 3,   // データ上は保持するが無料会員では非表示
     desc: '',
     taiken: null, kaihi: 9000,
     lesson: '',

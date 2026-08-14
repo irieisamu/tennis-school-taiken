@@ -45,8 +45,8 @@ function SchoolCard({ s, selected, onToggle, disabled }) {
           </div>
         )}
 
-        {/* 6. 評価・口コミ（1件でもあれば表示） */}
-        {s.reviews > 0 && (
+        {/* 6. 評価・口コミ（有料会員のみ。無料会員は非表示） */}
+        {s.paid && s.reviews > 0 && (
           <div style={{ marginBottom: 8 }}><Rating score={s.rating} count={s.reviews} /></div>
         )}
 
@@ -58,26 +58,32 @@ function SchoolCard({ s, selected, onToggle, disabled }) {
           }}>{s.desc}</p>
         )}
 
-        {/* 8. 料金（体験料金／会費・無ければ非表示） */}
-        <div style={{ display: 'flex', gap: 18, alignItems: 'baseline', padding: '9px 0 10px', borderTop: '1px solid var(--gray-100)' }}>
-          {s.taiken != null && (
-            <div className="price-row">
-              <span className="label">体験</span>
-              <span className="val"><span className="num">{s.taiken.toLocaleString()}</span>円<span className="unit">〜</span></span>
-            </div>
-          )}
-          {s.kaihi != null && (
-            <div className="price-row">
-              <span className="label">会費</span>
-              <span className="val"><span className="num">{s.kaihi.toLocaleString()}</span>円<span className="unit">〜</span></span>
-            </div>
-          )}
-        </div>
+        {/* 8. 料金（有料会員のみ。無料会員は非表示） */}
+        {s.paid && (
+          <div style={{ display: 'flex', gap: 18, alignItems: 'baseline', padding: '9px 0 10px', borderTop: '1px solid var(--gray-100)' }}>
+            {s.taiken != null && (
+              <div className="price-row">
+                <span className="label">体験</span>
+                <span className="val"><span className="num">{s.taiken.toLocaleString()}</span>円<span className="unit">〜</span></span>
+              </div>
+            )}
+            {s.kaihi != null && (
+              <div className="price-row">
+                <span className="label">会費</span>
+                <span className="val"><span className="num">{s.kaihi.toLocaleString()}</span>円<span className="unit">〜</span></span>
+              </div>
+            )}
+          </div>
+        )}
 
-        {/* 9. アクション（電話 / 体験申し込み / 詳細を見る の3列。電話はアイコンのみで細く） */}
+        {/* 9. アクション（有料：電話/体験申込/詳細の3列。無料：詳細のみ） */}
         <div style={{ display: 'flex', gap: 6 }}>
-          <a href="#" className="btn btn-out" aria-label="電話する" style={{ flex: '0 0 44px', padding: 0, height: 44 }}>{Ico.phone}</a>
-          <a href="#" className="btn" style={{ flex: 1, height: 44 }}>体験申し込み</a>
+          {s.paid && (
+            <>
+              <a href="#" className="btn btn-out" aria-label="電話する" style={{ flex: '0 0 44px', padding: 0, height: 44 }}>{Ico.phone}</a>
+              <a href="#" className="btn" style={{ flex: 1, height: 44 }}>体験申し込み</a>
+            </>
+          )}
           <a href="#" className="btn btn-out" style={{ flex: 1, height: 44 }}>詳細を見る{Ico.chevR}</a>
         </div>
       </div>
@@ -281,6 +287,19 @@ function ListFrame() {
         <span className="sm mute">…</span>
         <button className="btn btn-ghost btn-sm" style={{ width: 36, padding: 0 }}>7</button>
         <button className="btn btn-ghost btn-sm">次へ</button>
+      </div>
+
+      {/* 関連リンク（同エリア階層の一覧・比較への回遊導線） */}
+      <div style={{ background: 'var(--gray-50)', borderTop: '1px solid var(--gray-200)', padding: '16px 12px' }}>
+        <div className="sm" style={{ fontWeight: 800, color: 'var(--gray-700)', marginBottom: 10 }}>世田谷区で探す</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <a href="#" className="btn btn-out btn-block" style={{ justifyContent: 'space-between', height: 48, padding: '0 14px' }}>
+            世田谷区のおすすめスクール一覧を見る{Ico.chevR}
+          </a>
+          <a href="#" className="btn btn-out btn-block" style={{ justifyContent: 'space-between', height: 48, padding: '0 14px' }}>
+            世田谷区のスクール比較を見る{Ico.chevR}
+          </a>
+        </div>
       </div>
 
       {/* 下部固定：AI相談 FAB ＋ 比較トレイ（選択中のみ） */}
